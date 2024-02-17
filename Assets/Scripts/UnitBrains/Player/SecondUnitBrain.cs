@@ -3,7 +3,9 @@ using Model;
 using Model.Runtime.Projectiles;
 using Unity.VisualScripting;
 using UnityEngine;
-using Utilities;
+using UnitBrains;
+using UnitBrains.Pathfinding;
+using System.IO;
 
 namespace UnitBrains.Player
 {
@@ -16,14 +18,15 @@ namespace UnitBrains.Player
         private float _cooldownTime = 0f;
         private bool _overheated;
         private List<Vector2Int> TargetsOutOfRange = new List<Vector2Int>();
-        
+        protected Vector2Int[] path = null;
+
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
             float overheatTemperature = OverheatTemperature;
             float temp = GetTemperature();
 
             if (temp >= overheatTemperature) return;
-          
+
             for (int i = 0; i <= temp; i++)
             {
                 var projectile = CreateProjectile(forTarget);
@@ -44,7 +47,7 @@ namespace UnitBrains.Player
             }
             else
             {
-                return CalcNextStepTowards(target);
+                return base.GetNextStep();
             }
 
         }
@@ -91,9 +94,9 @@ namespace UnitBrains.Player
         public override void Update(float deltaTime, float time)
         {
             if (_overheated)
-            {              
+            {
                 _cooldownTime += Time.deltaTime;
-                float t = _cooldownTime / (OverheatCooldown/10);
+                float t = _cooldownTime / (OverheatCooldown / 10);
                 _temperature = Mathf.Lerp(OverheatTemperature, 0, t);
                 if (t >= 1)
                 {
@@ -105,7 +108,7 @@ namespace UnitBrains.Player
 
         private int GetTemperature()
         {
-            if(_overheated) return (int) OverheatTemperature;
+            if (_overheated) return (int)OverheatTemperature;
             else return (int)_temperature;
         }
 
