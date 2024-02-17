@@ -3,6 +3,7 @@ using Model;
 using Model.Runtime.Projectiles;
 using Unity.VisualScripting;
 using UnityEngine;
+using Utilities;
 
 namespace UnitBrains.Player
 {
@@ -35,16 +36,17 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            Vector2Int targetPosition = TargetsOutOfRange.Count > 0 ? TargetsOutOfRange[0] : unit.Pos;
+            Vector2Int target = TargetsOutOfRange.Count > 0 ? TargetsOutOfRange[0] : unit.Pos;
 
-            if (IsTargetInRange(targetPosition))
+            if (IsTargetInRange(target))
             {
                 return unit.Pos;
             }
             else
             {
-                return CalcNextStepTowards(targetPosition);
+                return CalcNextStepTowards(target);
             }
+
         }
 
         protected override List<Vector2Int> SelectTargets()
@@ -54,12 +56,7 @@ namespace UnitBrains.Player
 
             List<Vector2Int> result = new List<Vector2Int>();
 
-            foreach (var target in GetAllTargets())
-            {
-                result.Add(target);
-            }
-
-            foreach (Vector2Int target in result)
+            foreach (Vector2Int target in GetAllTargets())
             {
                 float distanceToOwnBase = DistanceToOwnBase(target);
                 if (distanceToOwnBase < closestDistanceToOwnBase)
@@ -69,7 +66,6 @@ namespace UnitBrains.Player
                 }
             }
 
-            result.Clear();
             TargetsOutOfRange.Clear();
 
             if (closestDistanceToOwnBase < float.MaxValue)
@@ -89,6 +85,7 @@ namespace UnitBrains.Player
             }
 
             return result;
+
         }
 
         public override void Update(float deltaTime, float time)
