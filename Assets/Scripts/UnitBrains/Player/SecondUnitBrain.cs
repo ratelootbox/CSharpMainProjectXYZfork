@@ -6,6 +6,7 @@ using UnityEngine;
 using UnitBrains;
 using UnitBrains.Pathfinding;
 using System.IO;
+using Utilities;
 
 namespace UnitBrains.Player
 {
@@ -47,7 +48,7 @@ namespace UnitBrains.Player
             }
             else
             {
-                return base.GetNextStep();
+                return unit.Pos.CalcNextStepTowards(target);
             }
 
         }
