@@ -18,8 +18,17 @@ namespace UnitBrains.Player
         private float _temperature = 0f;
         private float _cooldownTime = 0f;
         private bool _overheated;
+
         private List<Vector2Int> TargetsOutOfRange = new List<Vector2Int>();
-        protected Vector2Int[] path = null;
+
+        private static int _unitIndex = 0;
+        private const int MaxTargets = 4;
+        public int UnitID { get; private set; }
+
+        public SecondUnitBrain()
+        {
+            UnitID = _unitIndex++;
+        }
 
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
@@ -55,39 +64,41 @@ namespace UnitBrains.Player
 
         protected override List<Vector2Int> SelectTargets()
         {
-            float closestDistanceToOwnBase = float.MaxValue;
-            Vector2Int closestTarget = Vector2Int.zero;
-
             List<Vector2Int> result = new List<Vector2Int>();
-
-            foreach (Vector2Int target in GetAllTargets())
-            {
-                float distanceToOwnBase = DistanceToOwnBase(target);
-                if (distanceToOwnBase < closestDistanceToOwnBase)
-                {
-                    closestDistanceToOwnBase = distanceToOwnBase;
-                    closestTarget = target;
-                }
-            }
+            Vector2Int targetPosition;
 
             TargetsOutOfRange.Clear();
 
-            if (closestDistanceToOwnBase < float.MaxValue)
+            foreach (Vector2Int target in GetAllTargets())
             {
-                if (IsTargetInRange(closestTarget))
-                {
-                    result.Add(closestTarget);
-                }
-
-                TargetsOutOfRange.Add(closestTarget);
+                TargetsOutOfRange.Add(target);
             }
-            else
+
+            if (TargetsOutOfRange.Count == 0)
             {
                 int enemyBaseId = IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId;
                 Vector2Int enemyBase = runtimeModel.RoMap.Bases[enemyBaseId];
                 TargetsOutOfRange.Add(enemyBase);
             }
+            else
+            {
+                SortByDistanceToOwnBase(TargetsOutOfRange);
 
+                int targetIndex = UnitID % MaxTargets;
+
+                if ((targetIndex > (TargetsOutOfRange.Count - 1)) || targetIndex == 0)
+                {
+                    targetPosition = TargetsOutOfRange[0];
+                }
+                else
+                {
+                    targetPosition = TargetsOutOfRange[targetIndex - 1];
+                }             
+
+                if (IsTargetInRange(targetPosition))
+                    result.Add(targetPosition);
+            }
+           
             return result;
 
         }
