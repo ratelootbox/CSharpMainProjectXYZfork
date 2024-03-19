@@ -17,9 +17,43 @@ public class ThirdUnitBrain : DefaultPlayerUnitBrain
     private float _timer = 0f;
     private float _actionDelayTime = 0.1f;
     private UnitState _state = UnitState.Move;
-    private bool _changeState;
+    private bool _changeState = false;
 
     public override Vector2Int GetNextStep() // выбор ячейки для передвижения
+    {
+        return _changeState ? unit.Pos : base.GetNextStep();
+    }
+
+    public override void Update(float deltaTime, float time)
+    {
+        CheckStateChange();
+
+        if (_changeState)
+        {
+            _timer += Time.deltaTime;
+
+            if (_timer > _actionDelayTime)
+            {
+                _timer = 0f;
+                _changeState = false;
+            }
+        }
+       
+        base.Update(deltaTime, time);
+    }
+
+    protected override List<Vector2Int> SelectTargets() // выбор целей для атаки
+    {
+        if (_changeState)
+            return new List<Vector2Int>();
+
+        if(_state == UnitState.Attack)
+            return base.SelectTargets();
+
+        return new List<Vector2Int>();
+    }
+
+    private void CheckStateChange()
     {
         Vector2Int position = base.GetNextStep();
 
@@ -37,36 +71,6 @@ public class ThirdUnitBrain : DefaultPlayerUnitBrain
 
             _state = UnitState.Move;
         }
-
-        return _changeState ? unit.Pos : position;
-    }
-
-    public override void Update(float deltaTime, float time)
-    {
-        if (_changeState)
-        {
-            _timer += Time.deltaTime;
-
-            if (_timer > _actionDelayTime)
-            {
-                _timer = 0f;
-                _changeState = false;
-            }
-                 
-        }
-
-        base.Update(deltaTime, time);
-    }
-
-    protected override List<Vector2Int> SelectTargets() // выбор целей для атаки
-    {
-        if (_changeState)
-            return new List<Vector2Int>();
-
-        if(_state == UnitState.Attack)
-            return base.SelectTargets();
-
-        return new List<Vector2Int>();
     }
 
 }
