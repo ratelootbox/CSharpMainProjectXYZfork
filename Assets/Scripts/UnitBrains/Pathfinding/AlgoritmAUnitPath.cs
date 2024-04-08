@@ -14,23 +14,8 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
 {
     public class AlgoritmAUnitPath: BaseUnitPath
     {
-        /* (-1;1)  # (0;1)  # (1;1)
-         * #########################
-         * (-1;0)  # (0;0)  # (1:0)
-         * #########################
-         * (-1;-1) # (0;-1) # (1;-1)
-         * 
-         * 2 # 3 # 4
-         * #########
-         * 1 # x # 5
-         * #########
-         * 8 # 7 # 6
-         * 
-         * 2,4,6,8 диагональные шаги
-         */
-
-        private int[] dx = {-1, -1, 0, 1, 1, 1, 0, -1};
-        private int[] dy = {0, 1, 1, 1, 0, -1, -1, -1};
+        private int[] dx = {-1, 0, 1, 0};
+        private int[] dy = {0, 1, 0, -1};
 
         public AlgoritmAUnitPath(IReadOnlyRuntimeModel runtimeModel, Vector2Int startPoint, Vector2Int endPoint) :
             base(runtimeModel, startPoint, endPoint)
@@ -67,21 +52,6 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
                 openList.Remove(currentNode);
                 closedList.Add(currentNode);
 
-                if (!IsNodeReachable(targetNode))
-                {
-                    IEnumerable<IReadOnlyUnit> enemyUnits = runtimeModel.RoBotUnits;
-
-                    for (int i = 0; i < enemyUnits.Count() - 1; i++)
-                    {
-                        Node temp = new Node(enemyUnits.ToArray()[i].Pos);
-                        if (IsNodeReachable(temp)) 
-                        {
-                            targetNode = temp;
-                            break;
-                        }
-                    }
-                }
-
                 if (currentNode.Pos.x == targetNode.Pos.x && currentNode.Pos.y == targetNode.Pos.y)
                 {
                     List<Vector2Int> path = new List<Vector2Int>();
@@ -99,7 +69,6 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
                 {
                     int newX = currentNode.Pos.x + dx[i];
                     int newY = currentNode.Pos.y + dy[i];
-                    bool isDiagonalMove = (i + 1) % 2 == 0;
 
                     Vector2Int newPos = new Vector2Int(newX, newY);
 
@@ -113,7 +82,7 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
 
                     neighbor.Parent = currentNode;
                     neighbor.CalculateEstimate(targetNode.Pos);
-                    neighbor.CalculateValue(isDiagonalMove);
+                    neighbor.CalculateValue();
 
                     openList.Add(neighbor);
                     
@@ -121,24 +90,6 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
             }
 
             return null;
-        }
-
-        private bool IsNodeReachable(Node node)
-        {
-            bool b = false;
-            for (int i = 0; i < dx.Length; i++)
-            {
-                int newX = node.Pos.x + dx[i];
-                int newY = node.Pos.y + dy[i];
-
-                Vector2Int newPos = new Vector2Int(newX, newY);
-
-                b = runtimeModel.IsTileWalkable(newPos);
-                if (b)
-                    break;
-            }
-
-            return b;
         }
     }
 }

@@ -10,10 +10,9 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
     public class Node
     {
         public Vector2Int Pos;
-        public static float BaseCost = 10f;
-        public float DiaginalCost = BaseCost * 1.4f;
-        public float Estimate;
-        public float Value;
+        public int BaseCost = 10;
+        public int Estimate;
+        public int Value;
         public Node Parent;
 
         public Node(Vector2Int position)
@@ -21,9 +20,9 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
             Pos = position;
         }
 
-        public void CalculateValue(bool isDiagonalMove)
+        public void CalculateValue()
         {
-            Value = (isDiagonalMove ? DiaginalCost : BaseCost) + Estimate;
+            Value = BaseCost + Estimate;
         }
 
         public void CalculateEstimate(Vector2Int targetPos)
