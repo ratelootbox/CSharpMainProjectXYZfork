@@ -14,7 +14,7 @@ namespace UnitBrains.Pathfinding
         public BaseUnitPath Path { get; private set; }
         private readonly List<GameObject> allHighlights = new();
         private Coroutine highlightCoroutine;
-        private float _waitTime = 0.5f;
+        private float _delayTime = 0.1f;
 
         public void HighlightPath(BaseUnitPath path)
         {
@@ -38,8 +38,13 @@ namespace UnitBrains.Pathfinding
             {
                 CreateHighlight(cell);
 
-                yield return new WaitForSeconds(_waitTime);
+                if (allHighlights.Count() > maxHighlights)
+                    DestroyHighlight(0);
+
+                yield return new WaitForSeconds(_delayTime);
             }
+
+            HighlightPath(path);
         }
 
         private void CreateHighlight(Vector2Int atCell)

@@ -12,10 +12,14 @@ using UnityEngine;
 
 namespace Assets.Scripts.UnitBrains.Pathfinding
 {
-    public class AlgoritmAUnitPath: BaseUnitPath
+    public class AlgoritmAUnitPath : BaseUnitPath
     {
-        private int[] dx = {-1, 0, 1, 0};
-        private int[] dy = {0, 1, 0, -1};
+
+        private int[] dx = { -1, 0, 1, 0 };
+        private int[] dy = { 0, 1, 0, -1 };
+        private bool _isTargetFound;
+        private bool _isEnemyUnitClose;
+        private Node _nextToEnemyUnit;
 
         public AlgoritmAUnitPath(IReadOnlyRuntimeModel runtimeModel, Vector2Int startPoint, Vector2Int endPoint) :
             base(runtimeModel, startPoint, endPoint)
@@ -24,22 +28,17 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
 
         protected override void Calculate()
         {
-            path = FindPath().ToArray();
-
-            if (path == null)
-                path = new Vector2Int[] { startPoint };
-
-        }
-
-        public List<Vector2Int> FindPath()
-        {
             Node startNode = new Node(startPoint);
             Node targetNode = new Node(endPoint);
 
             List<Node> openList = new List<Node>() { startNode };
             List<Node> closedList = new List<Node>();
 
-            while (openList.Count > 0)
+            // ограничиваю цикл, чтобы если зависло, то не намертво
+            int counter = 0;
+            int maxCount = runtimeModel.RoMap.Width * runtimeModel.RoMap.Height;
+
+            while (openList.Count > 0 && counter++ < maxCount)
             {
                 Node currentNode = openList[0];
 
@@ -52,17 +51,10 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
                 openList.Remove(currentNode);
                 closedList.Add(currentNode);
 
-                if (currentNode.Pos.x == targetNode.Pos.x && currentNode.Pos.y == targetNode.Pos.y)
+                if (_isTargetFound)
                 {
-                    List<Vector2Int> path = new List<Vector2Int>();
-                    while (currentNode != null)
-                    {
-                        path.Add(currentNode.Pos);
-                        currentNode = currentNode.Parent;
-                    }
-
-                    path.Reverse();
-                    return path;
+                    path = FindPath(currentNode);
+                    return;
                 }
 
                 for (int i = 0; i < dx.Length; i++)
@@ -72,24 +64,60 @@ namespace Assets.Scripts.UnitBrains.Pathfinding
 
                     Vector2Int newPos = new Vector2Int(newX, newY);
 
-                    if (!runtimeModel.IsTileWalkable(newPos) && newPos != endPoint)
-                        continue;
-                   
-                    Node neighbor = new Node(newPos);
+                    if (newPos == targetNode.Pos)
+                        _isTargetFound = true;
 
-                    if (closedList.Contains(neighbor))
-                        continue;
 
-                    neighbor.Parent = currentNode;
-                    neighbor.CalculateEstimate(targetNode.Pos);
-                    neighbor.CalculateValue();
+                    if (runtimeModel.IsTileWalkable(newPos) || _isTargetFound)
+                    {
+                        Node neighbor = new Node(newPos);
 
-                    openList.Add(neighbor);
-                    
+                        if (closedList.Contains(neighbor))
+                            continue;
+
+                        neighbor.Parent = currentNode;
+                        neighbor.CalculateEstimate(targetNode.Pos);
+                        neighbor.CalculateValue();
+
+                        openList.Add(neighbor);
+                    }
+
+                    if (CheckEncounterWithEnemy(newPos) && !_isEnemyUnitClose)
+                    {
+                        _isEnemyUnitClose = true;
+                        _nextToEnemyUnit = currentNode;
+                    }
                 }
             }
 
-            return null;
+            if (_isEnemyUnitClose)
+            {
+                path = FindPath(_nextToEnemyUnit);
+                return;
+            }
+
+            path = new Vector2Int[] { startNode.Pos };
+        }
+
+        private bool CheckEncounterWithEnemy(Vector2Int newPos)
+        {
+            var botUnitPositions = runtimeModel.RoBotUnits.Select(u => u.Pos).Where(u => u == newPos);
+
+            return botUnitPositions.Any();
+        }
+
+        private Vector2Int[] FindPath(Node node)
+        {
+            List<Vector2Int> path = new();
+
+            while (node != null)
+            {
+                path.Add(node.Pos);
+                node = node.Parent;
+            }
+
+            path.Reverse();
+            return path.ToArray();
         }
     }
 }
