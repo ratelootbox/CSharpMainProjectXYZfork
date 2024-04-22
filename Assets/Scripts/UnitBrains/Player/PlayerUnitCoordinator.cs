@@ -1,5 +1,4 @@
-﻿using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer.Explorer;
-using Model;
+﻿using Model;
 using Model.Runtime.ReadOnly;
 using System;
 using System.Collections.Generic;
@@ -114,18 +113,6 @@ namespace Assets.Scripts.UnitBrains.Player
         {
             units.Sort(CompareByDistanceToPlayerBase);
         }
-        private void SortByAttackRange(List<IReadOnlyUnit> units)
-        {
-            units.Sort(CompareByAttackRange);
-        }
-
-        private int CompareByAttackRange(IReadOnlyUnit unitA, IReadOnlyUnit unitB)
-        {
-            var rangeA = unitA.Config.AttackRange;
-            var rangeB = unitB.Config.AttackRange;
-
-            return rangeA.CompareTo(rangeB);
-        }
 
         private int CompareByHealth(IReadOnlyUnit unitA, IReadOnlyUnit unitB)
         {
@@ -142,7 +129,6 @@ namespace Assets.Scripts.UnitBrains.Player
 
             return distanceA.CompareTo(distanceB);
         }
-
 
         public void Dispose()
         {
