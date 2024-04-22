@@ -80,7 +80,7 @@ namespace Assets.Scripts.UnitBrains.Player
                 SortByDistanceToPlayerBase(botUnits);
 
                 var x = botUnits.First().Pos.x;
-                var y = botUnits.First().Pos.y - Mathf.FloorToInt(_attackRange);
+                var y = botUnits.First().Pos.y - (int)Math.Round(_attackRange);
 
                 RecommendedPosition = new Vector2Int(x, y);
             }
