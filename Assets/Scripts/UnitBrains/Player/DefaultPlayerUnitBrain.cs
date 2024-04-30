@@ -16,8 +16,8 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            var recommendedTarget = PlayerUnitCoordinator.GetInstance().RecommendedTarget;
-            var recommendedPosition = PlayerUnitCoordinator.GetInstance().RecommendedPosition;
+            var recommendedTarget = UnitCoordinator.RecommendedTarget;
+            var recommendedPosition = UnitCoordinator.RecommendedPosition;
 
             _activePath = new AlgoritmAUnitPath(runtimeModel, unit.Pos, recommendedPosition);
 
@@ -45,7 +45,7 @@ namespace UnitBrains.Player
             var result = new List<Vector2Int>();
 
             var targets = GetReachableTargets();
-            var recommendedTarget = PlayerUnitCoordinator.GetInstance().RecommendedTarget;
+            var recommendedTarget = UnitCoordinator.RecommendedTarget;
 
             if (targets.Contains(recommendedTarget))
                 result.Add(recommendedTarget);

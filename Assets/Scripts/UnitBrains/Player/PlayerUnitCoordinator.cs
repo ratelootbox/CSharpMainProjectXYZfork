@@ -12,32 +12,22 @@ using Utilities;
 
 namespace Assets.Scripts.UnitBrains.Player
 {
-    public class PlayerUnitCoordinator : IDisposable
+    public class PlayerUnitCoordinator : IDisposable, IUnitCoordinator
     {
         public Vector2Int RecommendedTarget { get; private set; }
         public Vector2Int RecommendedPosition { get; private set; }
 
-        private static PlayerUnitCoordinator _instance;
         private IReadOnlyRuntimeModel _runtimeModel;
         private TimeUtil _timeUtil;
         private bool _enemyOnPlayerSide;
         private float _attackRange;
 
-        private PlayerUnitCoordinator()
+        public PlayerUnitCoordinator()
         {
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
             _timeUtil = ServiceLocator.Get<TimeUtil>();
 
-            _attackRange = _runtimeModel.RoPlayerUnits.First().Config.AttackRange;
             _timeUtil.AddFixedUpdateAction(UpdatePlayerUnitCoordinator);
-        }
-
-        public static PlayerUnitCoordinator GetInstance()
-        {
-            if (_instance == null)
-                _instance = new PlayerUnitCoordinator();
-
-            return _instance;
         }
 
         private void UpdatePlayerUnitCoordinator(float deltaTime)
@@ -77,6 +67,12 @@ namespace Assets.Scripts.UnitBrains.Player
             else
             {
                 SortByDistanceToPlayerBase(botUnits);
+                //_attackRange = _runtimeModel.RoPlayerUnits.First().Config.AttackRange;
+                var playerUnits = _runtimeModel.RoPlayerUnits.ToList();
+
+                if (playerUnits.Count != 0)
+                    _attackRange = playerUnits.First().Config.AttackRange;
+                else _attackRange = 3.5f;
 
                 var x = botUnits.First().Pos.x;
                 var y = botUnits.First().Pos.y - (int)Math.Round(_attackRange);
