@@ -61,18 +61,17 @@ namespace Model.Runtime
             
             if (_nextAttackTime < time && Attack())
             {
-                bool lucky = false;
-                if (Random.Range(1, 100) > 50)
-                {
-                    ServiceLocator.Get<EffectManager>().AddEffect(this, new IncAttSpdEffect(this));
-                    lucky = true;
-                }
+                //bool lucky = false;
+                //if (Random.Range(1, 100) > 50)
+                //{
+                //    ServiceLocator.Get<EffectManager>().AddEffect(this, new IncAttSpdEffect(this));
+                //    lucky = true;
+                //}
 
-                if (!lucky) 
-                {
-                    ServiceLocator.Get<EffectManager>().AddEffect(this, new DecAttSpdEffect(this));
-                }
-
+                //if (!lucky) 
+                //{
+                //    ServiceLocator.Get<EffectManager>().AddEffect(this, new DecAttSpdEffect(this));
+                //}
 
                 _nextAttackTime = time + Config.AttackDelay * _effectManager.GetModifier(this);
             }

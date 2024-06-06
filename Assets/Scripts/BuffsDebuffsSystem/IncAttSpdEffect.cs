@@ -1,4 +1,5 @@
 ﻿using Model.Runtime;
+using Model.Runtime.ReadOnly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace Assets.Scripts.BuffsDebuffsSystem
 {
     public class IncAttSpdEffect : Effect
     {
-        public IncAttSpdEffect(Unit _unit) : base(_unit)
+        public IncAttSpdEffect(IReadOnlyUnit _unit) : base(_unit)
         {
-            Modifier = 0.75f;
+            Modifier = 0.01f;
             Duration = 5f;
         }
     }

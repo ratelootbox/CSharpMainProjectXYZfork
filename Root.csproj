@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\View\TileView.cs" />
     <Compile Include="Assets\Scripts\Model\Runtime\Projectiles\BaseProjectile.cs" />
     <Compile Include="Assets\Scripts\UnitBrains\Enemy\EnemyUnitCoordinator.cs" />
+    <Compile Include="Assets\Scripts\UnitBrains\Player\SupportBufferBrain.cs" />
     <Compile Include="Assets\Scripts\View\UnitView.cs" />
     <Compile Include="Assets\Scripts\Model\Runtime\ReadOnly\IReadOnlyUnit.cs" />
     <Compile Include="Assets\Scripts\UnitBrains\BaseUnitBrain.cs" />

@@ -1,4 +1,5 @@
 ﻿using Model.Runtime;
+using Model.Runtime.ReadOnly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace Assets.Scripts.BuffsDebuffsSystem
 {
     public abstract class Effect
     {
-        protected Unit _unit;
+        protected IReadOnlyUnit _unit;
         public float Modifier {  get; set; }
         public float Duration { get; set; }
 
-        public Effect(Unit unit)
+        public Effect(IReadOnlyUnit unit)
         {
             _unit = unit;
         }

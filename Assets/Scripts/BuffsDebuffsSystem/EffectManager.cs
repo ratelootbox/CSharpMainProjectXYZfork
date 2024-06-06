@@ -1,4 +1,5 @@
 ﻿using Model.Runtime;
+using Model.Runtime.ReadOnly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Assets.Scripts.BuffsDebuffsSystem
     {
         private TimeUtil _timeUtil;
 
-        private Dictionary<Unit, List<Effect>> _unitsEffects = new Dictionary<Unit, List<Effect>>();
+        private Dictionary<IReadOnlyUnit, List<Effect>> _unitsEffects = new Dictionary<IReadOnlyUnit, List<Effect>>();
 
 
         public EffectManager()
@@ -22,7 +23,7 @@ namespace Assets.Scripts.BuffsDebuffsSystem
             _timeUtil.AddFixedUpdateAction(updateEffects);
         }
 
-        public void AddEffect(Unit unit, Effect effect)
+        public void AddEffect(IReadOnlyUnit unit, Effect effect)
         {
             if (!_unitsEffects.ContainsKey(unit))
             {
@@ -32,7 +33,7 @@ namespace Assets.Scripts.BuffsDebuffsSystem
             _unitsEffects[unit].Add(effect);
         }
 
-        public void RemoveEffect(Unit unit, Effect effect)
+        public void RemoveEffect(IReadOnlyUnit unit, Effect effect)
         {
             if (_unitsEffects.ContainsKey(unit))
             {
@@ -53,7 +54,7 @@ namespace Assets.Scripts.BuffsDebuffsSystem
             }
         }
 
-        public float GetModifier(Unit unit)
+        public float GetModifier(IReadOnlyUnit unit)
         {
             float modifier = 1f;
 
@@ -71,6 +72,11 @@ namespace Assets.Scripts.BuffsDebuffsSystem
         public void Dispose()
         {
            _timeUtil.RemoveFixedUpdateAction(updateEffects);
+        }
+
+        public bool HasActiveBuffs(IReadOnlyUnit unit)
+        {
+            return _unitsEffects.ContainsKey(unit) && _unitsEffects[unit].Count > 0;
         }
     }
 }
